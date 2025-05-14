@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Simple todo list project by using HTML, CSS and Java Script"
+    />
+    <meta name="keywords" content="HTML, CSS, JavaScript, DOM Manipulation, JSON" />
+    <meta name="author" content="Priya Singh" />
+    <title>Simple To-Do List</title>
+
+    <!-- ========== Start STYLING Section ========== -->
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: black;
+      }
+      .container {
+        max-width: 50rem;
+        margin: auto;
+        background: linear-gradient(to right, #401F42, #040812);
+        padding: 20px;
+        border: 3px solid white;
+        border-radius: 10px;
+        /* box-shadow: 0 4px 8px rgba(206, 8, 8, 0.1); */
+        text-align: center;
+        /* color: white; */
+        font-size: 1.3rem;
+        color: white;
+      }
+      input {
+        width: 70%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 2px solid white;
+        border-radius: 5px;
+        background-color: white;
+        color: black;
+        font-weight: bold;
+      }
+
+      input::placeholder{
+        color: black;
+      }
+
+      button {
+        padding: 5px 20px;
+        margin-right: 10px;
+        border: 3px solid white;
+        border-radius: 50px;
+        cursor: pointer;
+        background-color: green;
+        color: white;
+        font-family: cursive;
+        font-size: larger;
+        font-weight: bold;
+        transition: all 0.5s;
+      }
+
+      button:hover {
+        background-color: white;
+        border: 3px solid green;
+        color: green;
+      }
+
+      
+
+      li {
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        padding: 0rem 1rem;
+        border-radius: 50px;
+      }
+
+      .delete-btn {
+        background-color: #ff1100;
+        border: 3px solid white;
+        padding: 5px 30px;
+        border-radius: 50px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.5s;
+      }
+
+      .delete-btn:hover {
+        border: 3px solid #ff1100;
+        color: #ff1100;
+      }
+    </style>
+    <!-- ========== End STYLING Section ========== -->
+  </head>
+  <body>
+    <!-- ========== Start HTML Section ========== -->
+
+    <div class="container">
+      <h2>Yours To-Do</h2>
+
+      <input type="text" id="todoInput" placeholder="Enter your task" />
+
+      <div>
+        <button onclick="addData()">Add Data</button>
+      </div>
+
+      <ul id="todoList">
+        <!-- --------------List items will appear here -------------------->
+      </ul>
+    </div>
+    <!-- ========== End HTML Section ========== -->
+
+    <!-- ---------------------------------------------------------------------- -->
+
+    <!-- ========== Start SCRIPTING Section ========== -->
+
+    <script>
+      function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [ ];
+        tasks.forEach((task) => addTaskToDOM(task));
+      };
+
+      function saveTasks( ) {
+        const tasks = [];
+        document.querySelectorAll("#todoList li").forEach((li) => {
+          const taskText = li.querySelector("strong").textContent;
+          const taskTime = li.querySelector("div").textContent;
+          tasks.push(taskText + "||" + taskTime);
+        });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
+
+      function addTaskToDOM(task) {
+        const ul = document.getElementById("todoList");
+        const li = document.createElement("li");
+
+        const [taskText, taskTime] = task.split("||"); // Split the text and time
+        li.innerHTML = `
+    <div style="flex-grow:1; text-align:left;">
+      <strong>${taskText}</strong> 
+      <div style="font-size: small; color: gray;">${taskTime}</div>
+    </div>
+  `;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.onclick = function () {
+          ul.removeChild(li);
+          saveTasks();
+        };
+
+        li.appendChild(deleteBtn);
+        ul.appendChild(li);
+      }
+
+      // Adding date with date and time (time in hrs and seconds only).
+
+      function addData() {
+        const input = document.getElementById("todoInput");
+        const inputValue = input.value.trim();
+
+        if (inputValue === "") {
+          alert("Please enter a task!");
+          return;
+        }
+
+        const now = new Date();
+        const options = {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        };
+        const dateTimeString = now.toLocaleString("en-US", options); // No seconds
+
+        addTaskToDOM(inputValue + "||" + dateTimeString);
+        saveTasks();
+
+        input.value = "";
+      }
+
+      // Load tasks on page load
+      window.onload = loadTasks;
+
+      //By pressing enter to add Todo
+      document
+        .getElementById("todoInput")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            addData();
+          }
+        });
+    </script>
+
+    <!-- ========== End SCRIPTING Section ========== -->
+  </body>
+</html>
